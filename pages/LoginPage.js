@@ -1,20 +1,31 @@
 class LoginPage {
+    /**
+     * @param {import('@playwright/test').Page} page
+     */
     constructor(page) {
         this.page = page;
-
-        this.usernameInput = page.locator('#user-name');
-        this.passwordInput = page.locator('#password');
-        this.loginButton = page.locator('#login-button');
+        this.usernameInput = page.locator('[data-test="username"]');
+        this.passwordInput = page.locator('[data-test="password"]');
+        this.loginButton = page.locator('[data-test="login-button"]');
+        this.errorMessage = page.locator('[data-test="error"]');
     }
 
     async acessar() {
-        await this.page.goto('https://www.saucedemo.com/');
+        await this.page.goto('/');
     }
 
     async realizarLogin(usuario, senha) {
-        await this.usernameInput.fill(usuario);
-        await this.passwordInput.fill(senha);
+        if (usuario !== undefined && usuario !== null) {
+            await this.usernameInput.fill(usuario);
+        }
+        if (senha !== undefined && senha !== null) {
+            await this.passwordInput.fill(senha);
+        }
         await this.loginButton.click();
+    }
+
+    async obterMensagemErro() {
+        return await this.errorMessage.textContent();
     }
 }
 

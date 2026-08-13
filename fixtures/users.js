@@ -15,4 +15,12 @@ const users = {
     }
 };
 
-module.exports = { users };
+const checkoutData = {
+    valid: {
+        firstName: 'Marcius',
+        lastName: 'Barcellos',
+        postalCode: '90000-000'
+    }
+};
+
+module.exports = { users, checkoutData };
