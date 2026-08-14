@@ -6,12 +6,9 @@ class CartPage {
         this.page = page;
         this.title = page.locator('.title');
         this.cartItems = page.locator('.cart_item');
-        this.checkoutButton = page.locator('[data-test="checkout"]');
-        this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
-    }
-
-    async obterQuantidadeItens() {
-        return await this.cartItems.count();
+        this.itemNames = page.locator('.inventory_item_name');
+        this.checkoutButton = page.getByTestId('checkout');
+        this.continueShoppingButton = page.getByTestId('continue-shopping');
     }
 
     async iniciarCheckout() {
@@ -23,7 +20,7 @@ class CartPage {
     }
 
     async removerItem(itemSlug) {
-        await this.page.locator(`[data-test="remove-${itemSlug}"]`).click();
+        await this.page.getByTestId(`remove-${itemSlug}`).click();
     }
 }
 
