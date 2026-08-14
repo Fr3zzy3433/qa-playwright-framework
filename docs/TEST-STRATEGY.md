@@ -1,30 +1,104 @@
-# Estratégia de Testes de Automação (QA Test Strategy)
+# Estratégia de Testes — QA Playwright Automation Framework
 
 ## 1. Objetivo
-Garantir a qualidade, funcionalidade e integridade dos fluxos críticos da aplicação web SauceDemo através da automação de testes de ponta a ponta (E2E) com a ferramenta Playwright e JavaScript.
+
+Validar os fluxos funcionais críticos da aplicação pública SauceDemo através de automação E2E com Playwright e JavaScript, mantendo a suíte legível, isolada, reproduzível e útil para investigação de falhas.
 
 ## 2. Escopo
-- **Em Escopo**:
-  - Fluxo de Autenticação (cenários de sucesso, erro, bloqueio e casos de borda).
-  - Gestão de Inventário e Catálogo (visualização, adição/remoção de itens no carrinho e ordenação de preços).
-  - Fluxo de Checkout (preenchimento de dados do cliente, validação de campos obrigatórios, navegação e confirmação de pedido).
-- **Fora do Escopo**:
-  - Testes de carga e performance sob estresse.
-  - Testes de acessibilidade avançada (WCAG) nesta fase.
 
-## 3. Tipos de Teste
-- **Testes Funcionais E2E**: Validação dos cenários principais da perspectiva do usuário final (*Happy Path*).
-- **Testes Negativos e de Validação**: Garantia de tratamento adequado de erros e exibição de mensagens claras ao usuário.
-- **Testes Cross-Browser**: Execução em múltiplos navegadores (Chromium, Firefox e WebKit).
+### Em escopo
 
-## 4. Gestão de Dados de Teste
-- Centralizados em `fixtures/users.js`, cobrindo diferentes perfis disponibilizados pelo ambiente de testes (`standard_user`, `locked_out_user`, `problem_user`).
-- Isolamento total por teste: cada cenário inicializa seu próprio contexto e estado navegacional para evitar acoplamento.
+- **Autenticação**: sucesso, falhas de credencial, campos obrigatórios, usuário bloqueado, entradas de borda e proteção de rota.
+- **Inventário**: carregamento do catálogo, adição/remoção de produto e ordenação por preço.
+- **Carrinho**: persistência do item, remoção e navegação de retorno ao catálogo.
+- **Checkout**: preenchimento de dados, validação obrigatória, cancelamento e conclusão de compra.
+- **Cross-browser**: Chromium, Firefox e WebKit.
 
-## 5. Critérios de Aceite e Qualidade
-- **Critério de Sucesso**: 100% dos testes da suíte passando sem instabilidade (*flakiness*).
-- **Tratamento de Falhas**: Em caso de erro em CI, evidências detalhadas (screenshots, vídeos e trace files) são salvas automaticamente como artefato da pipeline.
+### Fora do escopo
 
-## 6. Riscos e Mitigações
-- **Mudanças na DOM/Locatores**: Utilização de seletores resilientes baseados em atributos `data-test` e roles do utilizador, minimizando quebras por alterações visuais de layout.
-- **Dependência de Conexão Externa**: Timeout configurado adequadamente em `playwright.config.js` (30s global, 5s para assertions).
+- Testes de carga, stress e performance.
+- Auditoria de acessibilidade especializada/WCAG.
+- Visual regression.
+- Testes de segurança aprofundados.
+- Validação de banco de dados ou serviços internos da aplicação.
+
+## 3. Abordagem
+
+A suíte combina:
+
+- **Happy Path** para os fluxos principais do usuário.
+- **Negative Testing** para credenciais, autenticação e campos obrigatórios.
+- **Boundary/Input Testing** para variações como strings vazias, espaços e capitalização.
+- **State Validation** para carrinho, navegação e conclusão do checkout.
+- **Cross-Browser Testing** através dos projetos nativos do Playwright.
+
+As assertions permanecem nos arquivos de teste para deixar explícito o comportamento validado. Page Objects encapsulam interação e locators reutilizáveis, não regras de aprovação do cenário.
+
+## 4. Dados e pré-condições
+
+- Dados de teste ficam centralizados em `fixtures/users.js`.
+- A suíte utiliza contas públicas fornecidas pelo próprio SauceDemo.
+- Cada teste recebe um contexto novo do Playwright.
+- `beforeEach` estabelece apenas a pré-condição necessária para o módulo atual.
+- Nenhum cenário depende do resultado ou estado deixado por outro teste.
+
+## 5. Estratégia de locators
+
+Prioridade:
+
+1. `getByTestId()` quando a aplicação fornece `data-test` estável.
+2. Locators estruturais simples quando não existe identificador de teste adequado.
+
+O projeto configura `testIdAttribute: 'data-test'` em `playwright.config.js`, transformando os atributos de teste da aplicação em um contrato explícito de automação.
+
+## 6. Estratégia de assertions e sincronização
+
+- Preferência por web-first assertions como `toHaveText`, `toContainText`, `toHaveURL`, `toHaveCount`, `toBeVisible` e `not.toBeVisible`.
+- Não são utilizados `waitForTimeout()` ou sleeps arbitrários.
+- A sincronização depende do auto-waiting do Playwright e de estados observáveis da interface.
+- Assertions síncronas são usadas apenas para dados já materializados em memória, como a comparação da lista numérica de preços após coleta da UI.
+
+## 7. Critérios de qualidade
+
+Uma mudança é considerada apta para merge quando:
+
+- todos os testes descobertos são executados sem falhas não explicadas;
+- a CI termina verde nos três projetos de navegador configurados;
+- não existem testes focados acidentalmente (`test.only`) em CI;
+- falhas reais retornam exit code diferente de zero;
+- documentação e quantidade de cenários permanecem coerentes com o código;
+- evidências suficientes são preservadas para investigar falhas.
+
+Retries em CI são usados como apoio diagnóstico contra instabilidade transitória do ambiente externo, não como mecanismo para transformar teste quebrado em sucesso silencioso. Uma falha recorrente deve ser investigada.
+
+## 8. Evidências
+
+Configuradas em `playwright.config.js`:
+
+- screenshot em falha;
+- vídeo retido em falha;
+- trace no primeiro retry;
+- HTML report;
+- diretório `test-results/` para outputs da execução.
+
+A pipeline publica `playwright-report/` e `test-results/` como artifact quando disponíveis.
+
+## 9. Riscos e limitações
+
+| Risco | Impacto | Mitigação |
+|---|---|---|
+| SauceDemo indisponível ou alterado | Falhas externas à suíte | CI, evidências e diagnóstico antes de alterar assertions |
+| Mudança de DOM | Quebra de locator | Uso de `data-test` quando disponível e locators simples |
+| Estado compartilhado | Flakiness / dependência de ordem | Contexto novo por teste e pré-condições explícitas |
+| Timing de UI | Assertions instáveis | Auto-waiting e web-first assertions |
+| Diferenças entre engines | Regressão específica de browser | Chromium, Firefox e WebKit na mesma suíte |
+
+## 10. Cobertura atual
+
+- Autenticação: 10 cenários.
+- Inventário: 4 cenários.
+- Carrinho: 3 cenários.
+- Checkout: 3 cenários.
+- **Total: 20 cenários automatizados.**
+
+A matriz detalhada está em `docs/TEST-CASES.md`.
