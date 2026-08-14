@@ -1,5 +1,7 @@
 # QA Playwright Automation Framework
 
+[![Playwright Tests](https://github.com/Fr3zzy3433/qa-playwright-framework/actions/workflows/playwright.yml/badge.svg)](https://github.com/Fr3zzy3433/qa-playwright-framework/actions/workflows/playwright.yml)
+
 Portfólio técnico de automação E2E com **Playwright + JavaScript** sobre a aplicação pública SauceDemo. O projeto demonstra desenho de cenários, Page Object Model, custom fixtures, assertions auto-retrying, execução cross-browser, evidências de falha e integração contínua com GitHub Actions.
 
 ## O que este projeto demonstra
