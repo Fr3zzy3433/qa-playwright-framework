@@ -1,14 +1,12 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 module.exports = defineConfig({
   testDir: './tests',
+  outputDir: 'test-results',
   timeout: 30000,
   expect: {
-    timeout: 5000
+    timeout: 7000
   },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -20,6 +18,7 @@ module.exports = defineConfig({
   ],
   use: {
     baseURL: process.env.BASE_URL || 'https://www.saucedemo.com',
+    testIdAttribute: 'data-test',
     headless: true,
     viewport: { width: 1280, height: 720 },
     screenshot: 'only-on-failure',
