@@ -10,16 +10,16 @@ class InventoryPage {
         this.inventoryItems = page.locator('.inventory_item');
         this.shoppingCartBadge = page.locator('.shopping_cart_badge');
         this.shoppingCartLink = page.locator('.shopping_cart_link');
-        this.sortSelect = page.locator('[data-test="product-sort-container"]');
+        this.sortSelect = page.getByTestId('product-sort-container');
         this.itemPrices = page.locator('.inventory_item_price');
     }
 
     async adicionarItemAoCarrinho(itemSlug) {
-        await this.page.locator(`[data-test="add-to-cart-${itemSlug}"]`).click();
+        await this.page.getByTestId(`add-to-cart-${itemSlug}`).click();
     }
 
     async removerItemDoCarrinho(itemSlug) {
-        await this.page.locator(`[data-test="remove-${itemSlug}"]`).click();
+        await this.page.getByTestId(`remove-${itemSlug}`).click();
     }
 
     async abrirCarrinho() {

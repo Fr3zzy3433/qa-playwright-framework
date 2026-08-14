@@ -1,8 +1,8 @@
 {
-  "name": "automation",
+  "name": "qa-playwright-framework",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "E2E QA automation portfolio with Playwright, JavaScript, Page Objects, custom fixtures and GitHub Actions.",
+  "private": true,
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
@@ -10,12 +10,21 @@
     "test:chromium": "playwright test --project=chromium",
     "test:firefox": "playwright test --project=firefox",
     "test:webkit": "playwright test --project=webkit",
+    "test:list": "playwright test --list",
     "report": "playwright show-report"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "playwright",
+    "qa",
+    "test-automation",
+    "e2e-testing"
+  ],
+  "author": "Marcius Logan Barcellos",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@playwright/test": "^1.61.1"
   }

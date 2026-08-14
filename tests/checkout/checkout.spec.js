@@ -2,7 +2,6 @@ const { test, expect } = require('../../fixtures/page-fixtures');
 const { users, checkoutData } = require('../../fixtures/users');
 
 test.describe('Fluxo de Checkout e Conclusão de Compra', () => {
-
     test.beforeEach(async ({ loginPage, inventoryPage }) => {
         await loginPage.acessar();
         await loginPage.realizarLogin(users.standard.username, users.standard.password);
@@ -20,32 +19,31 @@ test.describe('Fluxo de Checkout e Conclusão de Compra', () => {
         );
         await checkoutPage.continuar();
 
-        await expect(page).toHaveURL(/checkout-step-two.html/);
+        await expect(page).toHaveURL(/checkout-step-two\.html/);
         await expect(checkoutPage.summaryItemName).toHaveText('Sauce Labs Backpack');
         await expect(checkoutPage.summaryTotal).toContainText('Total: $32.39');
 
         await checkoutPage.finalizarCompra();
 
-        await expect(page).toHaveURL(/checkout-complete.html/);
-        const mensagemSucesso = await checkoutPage.obterMensagemSucesso();
-        expect(mensagemSucesso).toBe('Thank you for your order!');
+        await expect(page).toHaveURL(/checkout-complete\.html/);
+        await expect(checkoutPage.completeHeader).toHaveText('Thank you for your order!');
+        await expect(checkoutPage.backHomeButton).toBeVisible();
     });
 
     test('CHK-002 - Validar erro ao tentar avançar no checkout com campos obrigatórios vazios', async ({ cartPage, checkoutPage }) => {
         await cartPage.iniciarCheckout();
-
         await checkoutPage.preencherInformacoes('', '', '');
         await checkoutPage.continuar();
 
-        const erro = await checkoutPage.obterMensagemErro();
-        expect(erro).toContain('Error: First Name is required');
+        await expect(checkoutPage.errorMessage).toContainText('Error: First Name is required');
     });
 
     test('CHK-003 - Cancelar checkout na primeira etapa e retornar ao carrinho', async ({ page, cartPage, checkoutPage }) => {
         await cartPage.iniciarCheckout();
         await checkoutPage.cancelar();
 
-        await expect(page).toHaveURL(/cart.html/);
+        await expect(page).toHaveURL(/cart\.html/);
+        await expect(cartPage.title).toHaveText('Your Cart');
+        await expect(cartPage.cartItems).toHaveCount(1);
     });
-
 });
