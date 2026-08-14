@@ -4,10 +4,10 @@ class LoginPage {
      */
     constructor(page) {
         this.page = page;
-        this.usernameInput = page.locator('[data-test="username"]');
-        this.passwordInput = page.locator('[data-test="password"]');
-        this.loginButton = page.locator('[data-test="login-button"]');
-        this.errorMessage = page.locator('[data-test="error"]');
+        this.usernameInput = page.getByTestId('username');
+        this.passwordInput = page.getByTestId('password');
+        this.loginButton = page.getByTestId('login-button');
+        this.errorMessage = page.getByTestId('error');
     }
 
     async acessar() {
@@ -15,17 +15,9 @@ class LoginPage {
     }
 
     async realizarLogin(usuario, senha) {
-        if (usuario !== undefined && usuario !== null) {
-            await this.usernameInput.fill(usuario);
-        }
-        if (senha !== undefined && senha !== null) {
-            await this.passwordInput.fill(senha);
-        }
+        await this.usernameInput.fill(usuario ?? '');
+        await this.passwordInput.fill(senha ?? '');
         await this.loginButton.click();
-    }
-
-    async obterMensagemErro() {
-        return await this.errorMessage.textContent();
     }
 }
 
